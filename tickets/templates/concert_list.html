@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+
+{% load static %}
+<h1>Concert list:</h1>
+{% for concert in concerts %}
+    <div>
+<img src="{% static 'img/' %}{{ concert.image }}" alt="{{ concert.title }}">
+        <h2>{{ concert.title }}</h2>
+        <p>{{ concert.performer }}  |  {{ concert.date }}</p>
+        <p>{{ concert.description }}</p>
+    </div>
+{% empty %}
+    <p>Нема концертів</p>
+{% endfor %}
+
+{% endblock %}
