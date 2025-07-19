@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.templatetags.static import static
 
@@ -42,3 +42,6 @@ def concert_list(request):
     return render(request, 'concert_list.html', {'concerts': concerts})
 
 
+def concert_detail(request, concert_id):
+    concert = get_object_or_404(Concert, pk=concert_id)
+    return render(request, 'concert_detail.html', {'concert': concert})

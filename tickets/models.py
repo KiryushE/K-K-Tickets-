@@ -7,7 +7,7 @@ from django.templatetags.static import static
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, name, password=None):
         if not email:
-            raise ValueError("У пользователя должен быть email")
+            raise ValueError("У користувача повинен бути email")
         email = self.normalize_email(email)
         user = self.model(email=email, name=name)
         user.set_password(password)
@@ -62,5 +62,5 @@ class Seat(models.Model):
     booked = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"Ряд {self.row}, место {self.seat_number} — {'Занято' if self.booked else 'Свободно'}"
+        return f"Ряд {self.row}, місце {self.seat_number} — {'Зайнято' if self.booked else 'Вільно'}"
 

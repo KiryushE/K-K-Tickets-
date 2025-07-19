@@ -9,6 +9,7 @@
         <h2>{{ concert.title }}</h2>
         <p>{{ concert.performer }}  |  {{ concert.date }}</p>
         <p>{{ concert.description }}</p>
+        <a href="{% url 'concert_detail' concert.id %}">Детальніше</a>
     </div>
 {% empty %}
     <p>Нема концертів</p>

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ concert.title }} — K&K Tickets{% endblock %}
+
+{% block content %}
+<h1>{{ concert.title }}</h1>
+
+<img src="{{ concert.image_url }}" alt="{{ concert.title }}" style="max-width: 400px;">
+
+<p><strong>Виконавець:</strong> {{ concert.performer }}</p>
+<p><strong>Дата:</strong> {{ concert.date }}</p>
+<p><strong>Опис:</strong></p>
+<p>{{ concert.description }}</p>
+
+<a href="" class="btn btn-primary">Забронировать</a>
+
+{% endblock %}
