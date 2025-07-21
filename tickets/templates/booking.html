@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Бронювання місць  — {{ concert.title }}{% endblock %}
+
+{% block content %}
+
+<h2 class="content-start">Бронювання місць на концерт: {{ concert.title }}</h2>
+<p>Дата: {{ concert.date }}</p>
+<p>Виконавець: {{ concert.performer }}</p>
+
+<form method="post" id="bookingForm">
+  {% csrf_token %}
+  <div class="seats-container">
+{% for row_val in rows %}
+  <div class="seat-row d-flex mb-2">
+    {% for seat_val in seats %}
+      {% if ""|add:row_val|add:"-"|add:seat_val in user_seats %}
+        <img src="{% static 'img/yours.jpg' %}" class="seat" title="Ваше місце" />
+      {% elif ""|add:row_val|add:"-"|add:seat_val in taken_seats %}
+        <img src="{% static 'img/taken.jpg' %}" class="seat" title="Зайнято" />
+      {% else %}
+        <label>
+          <input type="checkbox" name="seats" value="" class="seat-checkbox" style="display: none">
+          <img src="{% static 'img/free.jpg' %}" class="seat seat-visual" title="Вільно" data-row="{{ row_val }}" data-seat="{{ seat_val }}" />
+        </label>
+      {% endif %}
+    {% endfor %}
+  </div>
+{% endfor %}
+  </div>
+
+  <button type="submit" class="btn btn-primary mt-3">Забронювати обрані місця</button>
+</form>
+
+<a href="{% url 'concert_list' %}" class="btn btn-secondary mt-3">Повернутися</a>
+
+<style>
+  .seat {
+    width: 30px;
+    height: 30px;
+    margin-right: 5px;
+    cursor: pointer;
+  }
+  .seat-visual.selected {
+    outline: 3px solid #28a745;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  .seat-row {
+    justify-content: start;
+  }
+
+
+</style>
+<script src="{% static 'js/booking.js' %}"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const bookingForm = document.getElementById('bookingForm');
+    if (bookingForm) {
+      bookingForm.addEventListener('submit', function(event) {
+
+
+        const selectedCheckboxes = bookingForm.querySelectorAll('.seat-checkbox:checked');
+        const selectedValues = Array.from(selectedCheckboxes).map(cb => cb.value);
+
+        console.log('--- ПРОВЕРКА ПЕРЕД ОТПРАВКОЙ ФОРМЫ ---');
+        console.log('Количество отмеченных чекбоксов:', selectedValues.length);
+        console.log('Значения отмеченных чекбоксов:', selectedValues);
+        console.log('-----------------------------------');
+      });
+    }
+  });
+</script>
+
+{% endblock %}

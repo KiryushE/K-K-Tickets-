@@ -1,18 +1,31 @@
 {% extends 'base.html' %}
-{% block content %}
-
 {% load static %}
-<h1>Concert list:</h1>
-{% for concert in concerts %}
-    <div>
-<img src="{% static 'img/' %}{{ concert.image }}" alt="{{ concert.title }}">
-        <h2>{{ concert.title }}</h2>
-        <p>{{ concert.performer }}  |  {{ concert.date }}</p>
-        <p>{{ concert.description }}</p>
-        <a href="{% url 'concert_detail' concert.id %}">Детальніше</a>
-    </div>
-{% empty %}
-    <p>Нема концертів</p>
-{% endfor %}
 
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Concert list:</h1>
+    <div class="row">
+        {% for concert in concerts %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-img-container">
+                        <img src="{% static 'img/' %}{{ concert.image }}" class="card-img-top" alt="{{ concert.title }}">
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ concert.title }}</h5>
+                        <p class="card-text">
+                            {{ concert.performer }} | {{ concert.date }}<br>
+                            {{ concert.description }}
+                        </p>
+                        <a href="{% url 'concert_detail' concert.id %}" class="btn btn-primary mt-auto">Детальніше</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <p>Немає концертів</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}

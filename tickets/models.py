@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.db import models
 from django.utils import timezone
 from django.templatetags.static import static
+from django.conf import settings
 
 
 class CustomUserManager(BaseUserManager):
@@ -64,3 +65,12 @@ class Seat(models.Model):
     def __str__(self):
         return f"Ряд {self.row}, місце {self.seat_number} — {'Зайнято' if self.booked else 'Вільно'}"
 
+
+class Booking(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    concert = models.ForeignKey(Concert, on_delete=models.CASCADE)
+    row = models.IntegerField()
+    seat = models.IntegerField()
+
+    class Meta:
+        unique_together = ('concert', 'row', 'seat')
