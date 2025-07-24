@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Бронювання місць  — {{ concert.title }}{% endblock %}
+{% block title %}Бронювання місць — {{ concert.title }}{% endblock %}
 
 {% block content %}
 
@@ -12,22 +12,29 @@
 <form method="post" id="bookingForm">
   {% csrf_token %}
   <div class="seats-container">
-{% for row_val in rows %}
-  <div class="seat-row d-flex mb-2">
-    {% for seat_val in seats %}
-      {% if ""|add:row_val|add:"-"|add:seat_val in user_seats %}
-        <img src="{% static 'img/yours.jpg' %}" class="seat" title="Ваше місце" />
-      {% elif ""|add:row_val|add:"-"|add:seat_val in taken_seats %}
-        <img src="{% static 'img/taken.jpg' %}" class="seat" title="Зайнято" />
-      {% else %}
-        <label>
-          <input type="checkbox" name="seats" value="" class="seat-checkbox" style="display: none">
-          <img src="{% static 'img/free.jpg' %}" class="seat seat-visual" title="Вільно" data-row="{{ row_val }}" data-seat="{{ seat_val }}" />
-        </label>
-      {% endif %}
+    {% for row_val in rows %}
+      <div class="seat-row d-flex mb-2">
+        {% for seat_val in seats %}
+          {# Формируем seat_id прямо в HTML #}
+          {% with seat_id=""|add:row_val|add:"-"|add:seat_val %}
+            {# Проверяем, забронировано ли место пользователем #}
+            {% if seat_id in user_seats %}
+              <img src="{% static 'img/yours.jpg' %}" class="seat" title="Ваше місце" />
+            {# Проверяем, занято ли место кем-то другим #}
+            {% elif seat_id in taken_seats %}
+              <img src="{% static 'img/taken.jpg' %}" class="seat" title="Занято" />
+            {# Если место свободно, отображаем его как интерактивное #}
+            {% else %}
+              <label for="seat-{{ seat_id }}"> {# Связываем label с checkbox по ID #}
+                {# Чекбокс теперь имеет ID и value, а также `checked` если нужно #}
+                <input type="checkbox" id="seat-{{ seat_id }}" name="seats" value="{{ seat_id }}" class="seat-checkbox" style="display: none">
+                <img src="{% static 'img/free.jpg' %}" class="seat" title="Вільно" /> {# Убрали data-атрибуты #}
+              </label>
+            {% endif %}
+          {% endwith %}
+        {% endfor %}
+      </div>
     {% endfor %}
-  </div>
-{% endfor %}
   </div>
 
   <button type="submit" class="btn btn-primary mt-3">Забронювати обрані місця</button>
@@ -42,36 +49,15 @@
     margin-right: 5px;
     cursor: pointer;
   }
-  .seat-visual.selected {
-    outline: 3px solid #28a745;
-    outline-offset: 2px;
-    border-radius: 4px;
-  }
+  /* Этот стиль для выделения больше не будет работать без JS */
+  /* .seat-visual.selected { */
+  /* outline: 3px solid #28a745; */
+  /* outline-offset: 2px; */
+  /* border-radius: 4px; */
+  /* } */
   .seat-row {
     justify-content: start;
   }
-
-
 </style>
-<script src="{% static 'js/booking.js' %}"></script>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const bookingForm = document.getElementById('bookingForm');
-    if (bookingForm) {
-      bookingForm.addEventListener('submit', function(event) {
-
-
-        const selectedCheckboxes = bookingForm.querySelectorAll('.seat-checkbox:checked');
-        const selectedValues = Array.from(selectedCheckboxes).map(cb => cb.value);
-
-        console.log('--- ПРОВЕРКА ПЕРЕД ОТПРАВКОЙ ФОРМЫ ---');
-        console.log('Количество отмеченных чекбоксов:', selectedValues.length);
-        console.log('Значения отмеченных чекбоксов:', selectedValues);
-        console.log('-----------------------------------');
-      });
-    }
-  });
-</script>
 
 {% endblock %}

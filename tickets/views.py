@@ -1,3 +1,4 @@
+import re
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
@@ -48,52 +49,62 @@ def concert_detail(request, concert_id):
     return render(request, 'concert_detail.html', {'concert': concert})
 
 
+# ... (начало views.py) ...
+
 @login_required
 def booking_view(request, concert_id):
     concert = get_object_or_404(Concert, id=concert_id)
     user = request.user
 
+    # Эти списки формируются каждый раз, когда страница загружается
     bookings = Booking.objects.filter(concert=concert)
     taken_seats = [f"{b.row}-{b.seat}" for b in bookings]
     user_seats = [f"{b.row}-{b.seat}" for b in bookings if b.user == user]
 
     if request.method == 'POST':
         selected_seats = request.POST.getlist('seats')
-        print("Отримані місця з форми:", selected_seats)
+
+        print("🔥 Отримані місця из формы (POST, без JS):", selected_seats)  # Лог для PyCharm
 
         if not selected_seats:
-            messages.error(request, "Оберіть хочаб одне місце!")
+            messages.error(request, "Оберіть хоча б одне місце!")
             return redirect('booking', concert_id=concert.id)
 
-        for seat in selected_seats:
+        for seat_id in selected_seats:
             try:
-                row_str, seat_str = seat.split('-')
+                row_str, seat_str = seat_id.split('-')
                 row = int(row_str)
                 seat_num = int(seat_str)
-                print(f"Опрацьовуємо місце: row={row}, seat={seat_num}")
+                print(f"👉 Опрацьовуємо місце: row={row}, seat={seat_num}")
             except (ValueError, IndexError):
-                messages.error(request, f"Некорректний формат місця: {seat}")
+                messages.error(request, f"Некорректний формат місця: {seat_id}")
                 continue
 
             already_taken = Booking.objects.filter(concert=concert, row=row, seat=seat_num).exists()
-            print(f"🔎 Чи зайнято {seat}? {'Так' if already_taken else 'Ні'}")
+            print(f"🔎 Чи зайнято {seat_id}? {'Так' if already_taken else 'Ні'}")
 
             if already_taken:
-                messages.warning(request, f"Місце {row + 1}-{seat_num + 1} вже зайнято")
+                messages.warning(request, f"Місце {row + 1}-{seat_num + 1} вже занято.")
             else:
                 Booking.objects.create(user=user, concert=concert, row=row, seat=seat_num)
-                print(f"Заброньоване місце: {row}-{seat_num}")
+                print(f"✅ Заброньоване місце: {row}-{seat_num}")
                 messages.success(request, f"Місце {row + 1}-{seat_num + 1} успішно заброньовано.")
 
+        # После обработки POST-запроса, перенаправляем пользователя на ту же страницу
+        # Это заставит страницу перезагрузиться и получить свежие данные из базы.
         return redirect('booking', concert_id=concert.id)
 
     context = {
         'concert': concert,
         'rows': list(range(5)),
         'seats': list(range(10)),
-        'taken_seats': taken_seats,
-        'user_seats': user_seats,
+        'taken_seats': taken_seats,  # Эти списки будут использоваться для определения цвета изображений
+        'user_seats': user_seats,  # после перезагрузки страницы.
     }
 
     return render(request, 'booking.html', context)
 
+
+@login_required
+def profile_view(request):
+    return render(request, 'profile.html')
