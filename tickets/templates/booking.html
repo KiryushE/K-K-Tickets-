@@ -5,7 +5,7 @@
 
 {% block content %}
 
-<h2 class="content-start">Бронювання місць на концерт: {{ concert.title }}</h2>
+<h2 class="content-start" style="padding-top: 80px;">Бронювання місць на концерт: {{ concert.title }}</h2>
 <p>Дата: {{ concert.date }}</p>
 <p>Виконавець: {{ concert.performer }}</p>
 
@@ -15,20 +15,15 @@
     {% for row_val in rows %}
       <div class="seat-row d-flex mb-2">
         {% for seat_val in seats %}
-          {# Формируем seat_id прямо в HTML #}
           {% with seat_id=""|add:row_val|add:"-"|add:seat_val %}
-            {# Проверяем, забронировано ли место пользователем #}
             {% if seat_id in user_seats %}
               <img src="{% static 'img/yours.jpg' %}" class="seat" title="Ваше місце" />
-            {# Проверяем, занято ли место кем-то другим #}
             {% elif seat_id in taken_seats %}
               <img src="{% static 'img/taken.jpg' %}" class="seat" title="Занято" />
-            {# Если место свободно, отображаем его как интерактивное #}
             {% else %}
-              <label for="seat-{{ seat_id }}"> {# Связываем label с checkbox по ID #}
-                {# Чекбокс теперь имеет ID и value, а также `checked` если нужно #}
+              <label for="seat-{{ seat_id }}">
                 <input type="checkbox" id="seat-{{ seat_id }}" name="seats" value="{{ seat_id }}" class="seat-checkbox" style="display: none">
-                <img src="{% static 'img/free.jpg' %}" class="seat" title="Вільно" /> {# Убрали data-атрибуты #}
+                <img src="{% static 'img/free.jpg' %}" class="seat" title="Вільно" />
               </label>
             {% endif %}
           {% endwith %}
@@ -37,7 +32,7 @@
     {% endfor %}
   </div>
 
-  <button type="submit" class="btn btn-primary mt-3">Забронювати обрані місця</button>
+  <button type="submit" class="btn mt-auto" style="background-color: #2f384f; color: white;">Забронювати обрані місця</button>
 </form>
 
 <a href="{% url 'concert_list' %}" class="btn btn-secondary mt-3">Повернутися</a>

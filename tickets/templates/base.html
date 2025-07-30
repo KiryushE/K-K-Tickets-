@@ -62,12 +62,10 @@
 <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
   <div class="container-fluid justify-content-center position-relative">
 
-    <!-- Логотип по центру -->
     <a href="{% url 'concert_list' %}" class="navbar-brand mx-auto d-flex align-items-center">
       <img src="{% static 'img/logo.png' %}" alt="Logo" height="40" style="margin-left: 60px;">
     </a>
 
-    <!-- Кнопки/дропдаун: позиционируем абсолютно справа, чтобы не влияли на лого -->
     <div style="position: absolute; top: 50%; right: 15px; transform: translateY(-50%); z-index: 1050;">
       {% if user.is_authenticated %}
       <div class="profile-dropdown text-center text-light" id="profileDropdown" style="position: relative;">
