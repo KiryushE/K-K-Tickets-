@@ -93,15 +93,9 @@ def booking_view(request, concert_id):
     return render(request, 'booking.html', context)
 
 
-# ... (весь ваш существующий код импортов) ...
-
 @login_required
 def profile_view(request):
-    # Получаем все бронирования для текущего пользователя,
-    # сразу получая связанные данные о концертах
     user_bookings = Booking.objects.filter(user=request.user).select_related('concert').order_by('concert__date')
-
-    # Группируем бронирования по концертам
     bookings_by_concert = {}
     for booking in user_bookings:
         concert_id = booking.concert.id
@@ -111,11 +105,7 @@ def profile_view(request):
                 'seats': []
             }
         bookings_by_concert[concert_id]['seats'].append(f"Ряд {booking.row + 1}, місце {booking.seat + 1}")
-
     context = {
         'bookings_by_concert': bookings_by_concert.values()
     }
-
     return render(request, 'profile.html', context)
-
-# ... (весь ваш существующий код ниже) ...
